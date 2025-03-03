@@ -3,4 +3,4 @@ action_observation	acva-acvk	action_observation_03.tsv	3	0	33
 demand_grid	dmgrd	demand_grid_03.tsv	3	33	66
 finger_sequence	fingseq	finger_sequence_03.tsv	3	66	99
 rest	rest	rest_03.tsv	3	99	132
-pong_game	pong	pong_game_03.tsv	3	132	165
+pong	pong	pong_03.tsv	3	132	165
