@@ -8,10 +8,10 @@ import MultiTaskBattery as mtb
 exp_name = '7TP' # name of the experiment
 
 #UNCOMMENT THIS FOR SCANNING
-response_keys    = ['y', 'g', 'r', 'm'] # scanner keys
+# response_keys    = ['y', 'g', 'r', 'm'] # scanner keys
 
 #COMMENT THIS FOR SCANNING
-# response_keys    = ['a', 's', 'd', 'f']
+response_keys    = ['a', 's', 'k', 'l']
 
 #not used
 response_fingers = ['Pinky', 'Ring','Middle', 'Index']
@@ -26,7 +26,7 @@ data_dir   = exp_dir / "data"          # This is where the result files are bein
 default_run_filename = 'run_01.tsv'
 
 # This is were the stimuli for the different task are stored
-package_dir = Path(os.path.dirname(os.path.dirname(os.path.realpath(mtb.__file__))))
+package_dir = Path(__file__).resolve().parents[2]
 stim_dir   = package_dir / "stimuli"
 
 # Is the Eye tracker being used?
