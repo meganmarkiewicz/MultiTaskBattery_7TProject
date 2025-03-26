@@ -256,11 +256,15 @@ class Rest(Task):
         super().__init__(info, screen, ttl_clock, const, subj_id)
         self.name          = 'rest'
 
-    def display_instructions(self): # overriding the display instruction routine from the parent
-        self.instruction_text = 'Rest: Fixate on the cross'
-        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1])
-        # instr.size = 0.8
+    def display_instructions(self): # overriding the display instruction from the parent class
+        self.instruction_text = f"Keep your eyes open and look at the plus sign."
+        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1],pos=(0, 0.3))
         instr_visual.draw()
+
+        image_path = self.const.package_dir / 'docs'/ 'images' / 'rest_icon.png'
+        # Task image (update the filename to the actual path of your image)
+        task_image = visual.ImageStim(self.window, image=image_path, pos=(0, -3), size=(4, 4))
+        task_image.draw()
         self.window.flip()
 
     def show_stim(self):
@@ -531,9 +535,14 @@ class ActionObservation(Task):
         super().__init__(info, screen, ttl_clock, const, subj_id)
 
     def display_instructions(self): # overriding the display instruction from the parent class
-        self.instruction_text = f"{self.descriptive_name} Task \n\n Keep your head still while watching the two clips. \n\n Try and remember the knot shown."
-        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1])
+        self.instruction_text = f"Watch the videos. Press the button when the star appears."
+        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1],pos=(0, 0.3))
         instr_visual.draw()
+
+        image_path = self.const.package_dir / 'docs'/ 'images' / 'act_obs_icon.png'
+        # Task image (update the filename to the actual path of your image)
+        task_image = visual.ImageStim(self.window, image=image_path, pos=(0, -3), size=(4, 4))
+        task_image.draw()
         self.window.flip()
 
     def run_trial(self, trial):
@@ -591,16 +600,15 @@ class DemandGrid(Task):
         self.trial_info = pd.read_csv(trial_info_file, sep='\t')
         self.corr_key = [self.trial_info['key_left'].iloc[0],self.trial_info['key_right'].iloc[0]]
 
-    def display_instructions(self):
-        """
-        displays the instruction for the task
-        """
-        str1 = f"You will watch the sequence of boxes that light up and then choose the correct pattern"
-        str2 = f"if left, press {self.corr_key[0]}"
-        str3 = f"if right, press {self.corr_key[1]}"
-        self.instruction_text = f"{self.descriptive_name} Task\n\n {str1} \n {str2} \n {str3}"
-        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1])
+    def display_instructions(self): 
+        self.instruction_text = f"Using the buttons, select the correct grid."
+        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1],pos=(0, 0.3))
         instr_visual.draw()
+
+        image_path = self.const.package_dir / 'docs'/ 'images' / 'demand_grid_icon.png'
+        # Task image (update the filename to the actual path of your image)
+        task_image = visual.ImageStim(self.window, image=image_path, pos=(0, -3), size=(4, 4))
+        task_image.draw()
         self.window.flip()
 
     def create_grid(self, sequence=None, position='center',grid_size=(3,4)):
@@ -890,10 +898,15 @@ class FingerSequence(Task):
         self.corr_key = [self.trial_info['key_one'].iloc[0],self.trial_info['key_two'].iloc[0],self.trial_info['key_three'].iloc[0],self.trial_info['key_four'].iloc[0]]
 
 
-    def display_instructions(self):
-        self.instruction_text = f"{self.descriptive_name} Task \n\n Using your four fingers, press the keys in the order shown on the screen\n Use all four fingers for this task"
-        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1])
+    def display_instructions(self): # overriding the display instruction from the parent class
+        self.instruction_text = f"Press the buttons that match the green boxes"
+        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1],pos=(0, 0.3))
         instr_visual.draw()
+
+        image_path = self.const.package_dir / 'docs'/ 'images' / 'fing_seq_icon.png'
+        # Task image (update the filename to the actual path of your image)
+        task_image = visual.ImageStim(self.window, image=image_path, pos=(0, -3), size=(4, 4))
+        task_image.draw()
         self.window.flip()
 
 
@@ -2169,10 +2182,15 @@ class Pong(Task):
         self.key_handler = key.KeyStateHandler()
         self.window.winHandle.push_handlers(self.key_handler)
 
-    def display_instructions(self):
-        self.instruction_text = f"{self.descriptive_name} Task\n\nUse the left and right keys to move the paddle"
-        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1])
+    def display_instructions(self): 
+        self.instruction_text = f"Use the buttons to move the paddle and catch the ball."
+        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1],pos=(0, 0.3))
         instr_visual.draw()
+
+        image_path = self.const.package_dir / 'docs'/ 'images' / 'pong_icon.png'
+        # Task image (update the filename to the actual path of your image)
+        task_image = visual.ImageStim(self.window, image=image_path, pos=(0, -3), size=(4, 4))
+        task_image.draw()
         self.window.flip()
 
     def run_trial(self, trial):
