@@ -550,11 +550,19 @@ class ActionObservation(Task):
         # Create a MovieStim3 object
         movie_clip = visual.MovieStim(self.window, movie_path_str, loop=False)
 
+        start_time = self.ttl_clock.get_time()
+        responses = [] # List to store responses
         while movie_clip.isFinished == False:
             movie_clip.play()
             movie_clip.draw()
             self.window.flip()
             self.ttl_clock.update()
+
+            # Check for keypresses during movie playback
+            keys = event.getKeys(keyList=self.const.response_keys, timeStamped=self.ttl_clock.clock)
+            for key, timestamp in keys:
+                rt = timestamp - start_time
+                responses.append((key, rt))
 
         self.screen.fixation_cross()
 
@@ -564,6 +572,8 @@ class ActionObservation(Task):
         # Flush memory
         movie_clip.unload()
         gc.collect() # Collect garbarge
+
+        trial['response'] = responses
 
         return trial
 
