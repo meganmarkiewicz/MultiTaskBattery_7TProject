@@ -180,8 +180,10 @@ class Experiment:
         for task in self.task_obj_list:
             task.save_data(self.subj_id, self.run_number)
 
-        # show the scoreboard
-        self.display_run_feedback(run_data)
+        # Dont show the scoreboard, show fixation cross instead
+        self.screen.fixation_cross()
+        event.waitKeys()
+        
 
 
     def display_run_feedback(self, run_data):
