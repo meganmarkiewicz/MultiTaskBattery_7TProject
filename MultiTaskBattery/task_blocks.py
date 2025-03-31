@@ -887,7 +887,7 @@ class FingerSequence(Task):
     """
     def __init__(self, info, screen, ttl_clock, const, subj_id):
         super().__init__(info, screen, ttl_clock, const, subj_id)
-        self.feedback_type = 'acc+rt'
+        self.feedback_type = 'acc'
 
     def init_task(self):
         """
@@ -909,80 +909,63 @@ class FingerSequence(Task):
         task_image.draw()
         self.window.flip()
 
-
     def run_trial(self, trial):
-        """ Run a single trial of the finger sequence task. """
-        #clear buffer
+        """ Run a single trial of the finger sequence task using timed light-up cues with 4 boxes. """
+
+        # Clear any previous presses
         event.clearEvents()
 
-         # Display the sequence
+        # get the stim
         sequence = trial['stim'].split()
-
-        # Calculate the start position for the sequence and determine the spacing between numbers
         num_items = len(sequence)
-        spacing = 2.0  
-        start_x = -(num_items - 1) * spacing / 2
 
-        # Show the numbers in the sequence next to each other ( using the spacing and start_x calculated above)
-        for i, number in enumerate(sequence):
-            pos = (start_x + i * spacing, 0.0)  # Horizontal position is adjusted based on index
-            stim = visual.TextStim(self.window, text=number, pos=pos, color='black', units='deg', height=1.5)
-            stim.draw()
+        # define boxes
+        box_positions = [(-5, 2), (-3, 2), (3, 2), (5, 2)]
+        boxes = []
+        for pos in box_positions:
+            box = visual.Rect(self.window, width=2, height=2, pos=pos, fillColor='white', lineColor='black', units='deg')
+            boxes.append(box)
 
+        # draw boxes (initially white)
+        for box in boxes:
+            box.draw()
         self.window.flip()
 
-        
-        sequence_start_time = self.ttl_clock.get_time() # Needed for knowing when to stop looking for key presses
-        digit_start_time = sequence_start_time # Updated with each key press for calculating RT
+        correct_presses = 0
 
-        rt_list = np.full(num_items,np.nan)
-        correct_list = np.zeros((num_items,)) # List of booleans indicating whether each press was correct needed for overall trial accuracy
-        num_presses =0
-        # Initialize the color for each digit in the sequence as black
-        digit_colors = ['black'] * num_items
-        while self.ttl_clock.get_time() - sequence_start_time < trial['trial_dur'] and num_presses < num_items:
-            self.ttl_clock.update()
+        # make box light up
+        for digit in sequence:
+            target_index = int(digit) - 1
+
+            # Light up target box green
+            for i, box in enumerate(boxes):
+                box.fillColor = 'green' if i == target_index else 'white'
+                box.draw()
+            self.window.flip()
+            core.wait(0.2)  # light up for 200 ms
 
             keys = event.getKeys(keyList=self.const.response_keys, timeStamped=self.ttl_clock.clock)
             if keys:
                 key_char, key_press_time = keys[0]
                 key = self.const.response_keys.index(key_char) + 1
-                rt = key_press_time - digit_start_time
-                rt_list[num_presses]=rt
-                digit_start_time = key_press_time
 
                 # Check if key pressed is correct
-                correct_list[num_presses] = key == int(sequence[num_presses])
- 
-                # Update color based on correctness
-                digit_colors[num_presses] = 'green' if correct_list[num_presses] else 'red'
+                if key == int(digit):
+                    correct_presses += 1
 
-                num_presses += 1
-            # Draw all digits with their adjusted colors
-            for i, (number, color) in enumerate(zip(sequence, digit_colors)):
-                pos = (start_x + i * spacing, 0.0)
-                stim = visual.TextStim(self.window, text=number, pos=pos, color=color, units='deg', height=1.5)
-                stim.draw()
+            
+            # if its not the last digit, wait for 0.4 with a white box
+            if digit != sequence[-1]:
+                # Turn all boxes white again
+                for box in boxes:
+                    box.fillColor = 'white'
+                    box.draw()
+                self.window.flip()
+                core.wait(0.4)
+        self.screen.fixation_cross('white')
 
-            self.window.flip()
-
-        else:
-            # If the sequence is completed, wait until the end of the trial
-            self.ttl_clock.wait_until(sequence_start_time + trial['trial_dur'])
-
-        # if any press is wrong trial['correct'] needs to be false, this is for post trial feedback
-        trial['correct'] = correct_list.sum()/num_items
-
-        if np.all(np.isnan(rt_list)):
-            # calculate mean rt across presses
-            trial['rt'] = np.nan
-
-        else:
-            trial['rt'] = np.nanmean(rt_list)
- 
-        # display trial feedback (for whole trial)
-        self.display_trial_feedback(trial['display_trial_feedback'], trial['correct']== 1)
-
+        # Save performance results
+        trial['correct'] = correct_presses / num_items 
         return trial
     
 class Sencoding(Task):
