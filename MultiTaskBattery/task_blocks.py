@@ -549,6 +549,7 @@ class ActionObservation(Task):
         """ Runs a single trial of the ActionObservation task """
         # Assuming that 'stim' column in trial contains the file name of the video clip
         movie_file_name = trial['stim']
+        display_panda = trial['display_panda']
 
         # Construct the movie file path
         movie_path = Path(self.const.stim_dir) / self.name / 'clips' / movie_file_name
@@ -568,15 +569,25 @@ class ActionObservation(Task):
             self.ttl_clock.update()
 
             # Check for keypresses during movie playback
+            # keys = event.getKeys(keyList=self.const.response_keys, timeStamped=self.ttl_clock.clock)
+            # for key, timestamp in keys:
+            #     rt = timestamp - start_time
+            #     responses.append((key, rt))
+
+        if display_panda:
+            image_path= self.const.package_dir / 'docs'/ 'images' / 'panda_icon.png'
+            task_image = visual.ImageStim(self.window, image=image_path, pos=(0, -3), size=(4, 4))
+            task_image.draw()
+            self.window.flip()
+            self.ttl_clock.wait_until(self.ttl_clock.get_time() + trial['iti_dur'])
+
             keys = event.getKeys(keyList=self.const.response_keys, timeStamped=self.ttl_clock.clock)
             for key, timestamp in keys:
                 rt = timestamp - start_time
                 responses.append((key, rt))
-
-        self.screen.fixation_cross()
-
-        # Display trial feedback
-        self.display_trial_feedback(give_feedback= trial['display_trial_feedback'], correct_response = None)
+        else:
+            # # Display trial feedback
+            self.display_trial_feedback(give_feedback= trial['display_trial_feedback'], correct_response = None)
 
         # Flush memory
         movie_clip.unload()
@@ -2179,9 +2190,9 @@ class Pong(Task):
     def run_trial(self, trial):
         # Set parameters (all values are in degrees)
         paddle_speed = 0.5        # Movement per frame (deg)
-        paddle_width = 3.0         # Paddle width (deg)
-        paddle_height = 0.3        # Paddle thickness (deg)
-        ball_radius = 0.4          # Ball radius (deg)
+        paddle_width = 7         # Paddle width (deg)
+        paddle_height = 0.6        # Paddle thickness (deg)
+        ball_radius = 0.8          # Ball radius (deg)
         trial_duration = trial['trial_dur']
 
         # Compute the effective screen dimensions (in degrees) based on monitor calibration.
@@ -2232,6 +2243,10 @@ class Pong(Task):
         key_right = getattr(key, self.const.response_keys[self.corr_key[1]-1].upper(), None)
         trial['correct'] = False
         
+        
+        ball_stuck = False
+        ball_offset_x = 0
+        
         while self.ttl_clock.get_time() - start_time < trial_duration:
             if self.key_handler[key_left]:
                 paddle.pos = (paddle.pos[0] - paddle_speed, paddle.pos[1])
@@ -2245,19 +2260,25 @@ class Pong(Task):
                 paddle.pos = (max_x, paddle.pos[1])
 
             # Update the ball position
-            ball.pos = (ball.pos[0] + dx, ball.pos[1] + dy)
+            if not ball_stuck:
+                ball.pos = (ball.pos[0] + dx, ball.pos[1] + dy)
+            else:
+                ball.pos = (paddle.pos[0] + ball_offset_x, paddle_y + paddle_height + ball_radius)
+
 
             # Bounce the ball off the side walls
             if ball.pos[0] >= half_screen_width - ball_radius or ball.pos[0] <= -half_screen_width + ball_radius:
                 dx *= -1
 
-            # Bounce the ball off the paddle if it's in the correct vertical range
-            # Only process collision if the ball is moving downward because of bug when paddle is in the middle of ball
-            if dy < 0 and (paddle_y - ball_radius) < ball.pos[1] < (paddle_y + paddle_height + ball_radius):
-                if (paddle.pos[0] - paddle_half_width) < ball.pos[0] < (paddle.pos[0] + paddle_half_width):
-                    dy *= -1
-                    trial['correct'] = True
 
+            # Stick the ball to the paddle if it hits
+            if not ball_stuck and dy < 0 and (paddle_y - ball_radius) < ball.pos[1] < (paddle_y + paddle_height + ball_radius):
+                if (paddle.pos[0] - paddle_half_width) < ball.pos[0] < (paddle.pos[0] + paddle_half_width):
+                    dy = 0
+                    dx = 0
+                    ball_stuck = True
+                    ball_offset_x = ball.pos[0] - paddle.pos[0]  # Remember how far from center it landed
+                    trial['correct'] = True
 
             # Draw the stimuli and update the display
             ball.draw()
