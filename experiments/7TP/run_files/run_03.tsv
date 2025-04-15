@@ -1,8 +1,5 @@
 task_name	task_code	task_file	instruction_dur	start_time	end_time
 action_observation	acva-acvk	action_observation_03.tsv	3	0	27
-rest	rest	rest_01.tsv	0	27	42
-demand_grid	dmgrd	demand_grid_03.tsv	3	42	69
-rest	rest	rest_01.tsv	0	69	84
-finger_sequence	fingseq	finger_sequence_03.tsv	3	84	111
-rest	rest	rest_01.tsv	0	111	126
-pong	pong	pong_03.tsv	3	126	153
+demand_grid	dmgrd	demand_grid_03.tsv	3	27	54
+finger_sequence	fingseq	finger_sequence_03.tsv	3	54	81
+pong	pong	pong_03.tsv	3	81	108
