@@ -943,17 +943,22 @@ class FingerSequence(Task):
         self.window.flip()
 
         correct_presses = 0
-
+         # wait for an initial 1 second
+        trial_start = self.ttl_clock.get_time()
+        self.ttl_clock.wait_until(trial_start + 1)  # initial delay
         # make box light up
-        for digit in sequence:
+        for i, digit in enumerate(sequence):
+            press_time = trial_start + 1 + i * 1.5
+            release_time = press_time + 0.5
+
             target_index = int(digit) - 1
 
             # Light up target box green
-            for i, box in enumerate(boxes):
-                box.fillColor = 'green' if i == target_index else 'white'
+            for j, box in enumerate(boxes):
+                box.fillColor = 'green' if j == target_index else 'white'
                 box.draw()
             self.window.flip()
-            core.wait(0.2)  # light up for 200 ms
+            self.ttl_clock.wait_until(release_time)
 
             keys = event.getKeys(keyList=self.const.response_keys, timeStamped=self.ttl_clock.clock)
             if keys:
@@ -966,13 +971,14 @@ class FingerSequence(Task):
 
             
             # if its not the last digit, wait for 0.4 with a white box
-            if digit != sequence[-1]:
+            if i != len(sequence) - 1:
+                white_start_time = release_time
                 # Turn all boxes white again
                 for box in boxes:
                     box.fillColor = 'white'
                     box.draw()
                 self.window.flip()
-                core.wait(0.4)
+                self.ttl_clock.wait_until(white_start_time + 1.0) 
         self.screen.fixation_cross('white')
 
         # Save performance results
