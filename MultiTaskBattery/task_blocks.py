@@ -535,7 +535,7 @@ class ActionObservation(Task):
         super().__init__(info, screen, ttl_clock, const, subj_id)
 
     def display_instructions(self): # overriding the display instruction from the parent class
-        self.instruction_text = f"Watch the videos. Press the button when the star appears."
+        self.instruction_text = f"Watch the videos. Press the button when the panda appears."
         instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1],pos=(0, 0.3))
         instr_visual.draw()
 
