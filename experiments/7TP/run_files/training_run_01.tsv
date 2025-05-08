@@ -1,6 +1,9 @@
 task_name	task_code	task_file	instruction_dur	start_time	end_time
 finger_sequence	fingseq	training_finger_sequence_01.tsv	3	0	27
+rest	rest	training_rest_01.tsv	3	27	42
 action_observation	acva-acvk	training_action_observation_01.tsv	3	42	69
+rest	rest	training_rest_01.tsv	3	69	84
 demand_grid	dmgrd	training_demand_grid_01.tsv	3	84	111
+rest	rest	training_rest_01.tsv	3	111	126
 pong	pong	training_pong_01.tsv	3	126	153
 
