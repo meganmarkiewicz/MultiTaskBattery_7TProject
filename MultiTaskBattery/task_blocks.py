@@ -558,8 +558,10 @@ class ActionObservation(Task):
         # Convert Path object to string for compatibility
         movie_path_str = str(movie_path)
 
+        size = self.screen.size
+
         # Create a MovieStim3 object
-        movie_clip = visual.MovieStim(self.window, movie_path_str, loop=False)
+        movie_clip = visual.MovieStim(self.window, movie_path_str,size=size, loop=False)
 
         start_time = self.ttl_clock.get_time()
         responses = [] # List to store responses
