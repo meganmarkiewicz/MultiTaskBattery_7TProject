@@ -257,14 +257,15 @@ class Rest(Task):
         self.name          = 'rest'
 
     def display_instructions(self): # overriding the display instruction from the parent class
-        self.instruction_text = f"Keep your eyes open and look at the plus sign."
-        instr_visual = visual.TextStim(self.window, text=self.instruction_text, color=[-1, -1, -1],pos=(0, 0.3))
-        instr_visual.draw()
+        top_text = visual.TextStim(self.window,text="Rest",color=[-1, -1, -1],pos=(0, 3),height=1.5)
+        top_text.draw()
 
-        image_path = self.const.package_dir / 'docs'/ 'images' / 'rest_icon.png'
-        # Task image (update the filename to the actual path of your image)
-        task_image = visual.ImageStim(self.window, image=image_path, pos=(0, -3), size=(4, 4))
-        task_image.draw()
+        bottom_text = visual.TextStim(self.window,text="Look at the crosshair",color=[-1, -1, -1],pos=(0, -3),height=1.5)
+        bottom_text.draw()
+
+        self.screen.fixation_cross(flip=False)
+
+        # flip the window once all elements are drawn
         self.window.flip()
 
     def show_stim(self):
