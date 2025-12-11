@@ -2280,14 +2280,36 @@ class Pong(Task):
                 dx *= -1
 
 
-            # Stick the ball to the paddle if it hits
-            if not ball_stuck and dy < 0 and (paddle_y - ball_radius) < ball.pos[1] < (paddle_y + paddle_height + ball_radius):
-                if (paddle.pos[0] - paddle_half_width) < ball.pos[0] < (paddle.pos[0] + paddle_half_width):
-                    dy = 0
-                    dx = 0
-                    ball_stuck = True
-                    ball_offset_x = ball.pos[0] - paddle.pos[0]  # Remember how far from center it landed
-                    trial['correct'] = True
+           # Paddle geometry
+            paddle_top = paddle.pos[1] + paddle_height / 2
+            paddle_left = paddle.pos[0] - paddle_half_width
+            paddle_right = paddle.pos[0] + paddle_half_width
+
+            # Ball geometry
+            ball_bottom = ball.pos[1] - ball_radius
+            ball_prev_bottom = (ball.pos[1] - dy) - ball_radius
+
+            # 1. Must cross top surface from above
+            hit_vertical = (
+                dy < 0 and
+                ball_prev_bottom > paddle_top and     
+                ball_bottom <= paddle_top             
+            )
+
+            # 2. Horizontal overlap allowed (edges OK)
+            # ANY overlap between the ball's bottom segment and paddle width
+            hit_horizontal = (
+                (ball.pos[0] + ball_radius) >= paddle_left and
+                (ball.pos[0] - ball_radius) <= paddle_right
+            )
+
+            # Final
+            if not ball_stuck and hit_vertical and hit_horizontal:
+                dx = 0
+                dy = 0
+                ball_stuck = True
+                ball_offset_x = ball.pos[0] - paddle.pos[0]
+                trial['correct'] = True
 
             # Draw the stimuli and update the display
             ball.draw()
