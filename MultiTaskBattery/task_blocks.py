@@ -15,6 +15,7 @@ from copy import deepcopy
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 import gc
 import math
+import os
 
 
 class Task:
@@ -534,6 +535,25 @@ class IntactPassage(Task):
 class ActionObservation(Task):
     def __init__(self, info, screen, ttl_clock, const, subj_id):
         super().__init__(info, screen, ttl_clock, const, subj_id)
+        self.name = "action_observation"
+        self.preload_movies() 
+
+    def preload_movies(self):
+        self.movie_cache = {}
+
+        movie_dir = Path(self.const.stim_dir) / self.name / 'clips'
+        size = self.screen.size
+
+        for fname in os.listdir(movie_dir):
+            if fname.endswith(".mov"):
+                clip_path = str(movie_dir / fname)
+                self.movie_cache[fname] = visual.MovieStim(
+                    self.window,
+                    clip_path,
+                    size=size,
+                    loop=False,
+                    noAudio=True
+                )
 
     def display_instructions(self): # overriding the display instruction from the parent class
         self.instruction_text = f"Watch the videos. Press the button when the panda appears."
@@ -553,23 +573,23 @@ class ActionObservation(Task):
         display_panda = trial['display_panda']
 
         # Construct the movie file path
-        movie_path = Path(self.const.stim_dir) / self.name / 'clips' / movie_file_name
+        movie_clip = self.movie_cache[movie_file_name]
 
-        # Convert Path object to string for compatibility
-        movie_path_str = str(movie_path)
+        # Reset movie to frame 0
+        movie_clip.seek(0)
+        movie_clip.play()
 
-        size = self.screen.size
-
-        # Create a MovieStim3 object
-        movie_clip = visual.MovieStim(self.window, movie_path_str,size=size, loop=False)
+        # Prebuffer first frame before flip
+        movie_clip.draw()
+        self.window.flip()
 
         start_time = self.ttl_clock.get_time()
-        responses = [] # List to store responses
-        while movie_clip.isFinished == False:
-            movie_clip.play()
+        responses = []
+        while not movie_clip.isFinished:
             movie_clip.draw()
             self.window.flip()
             self.ttl_clock.update()
+        movie_clip.stop()
 
             # Check for keypresses during movie playback
             # keys = event.getKeys(keyList=self.const.response_keys, timeStamped=self.ttl_clock.clock)
@@ -591,10 +611,6 @@ class ActionObservation(Task):
         else:
             # # Display trial feedback
             self.display_trial_feedback(give_feedback= trial['display_trial_feedback'], correct_response = None)
-
-        # Flush memory
-        movie_clip.unload()
-        gc.collect() # Collect garbarge
 
         trial['response'] = responses
 
