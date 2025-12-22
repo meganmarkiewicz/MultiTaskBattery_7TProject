@@ -597,6 +597,8 @@ class ActionObservation(Task):
             #     rt = timestamp - start_time
             #     responses.append((key, rt))
 
+        panda_show_time = self.ttl_clock.get_time()
+
         if display_panda:
             image_path= self.const.package_dir / 'docs'/ 'images' / 'panda_icon.png'
             task_image = visual.ImageStim(self.window, image=image_path, pos=(0, -3), size=(4, 4))
@@ -606,7 +608,7 @@ class ActionObservation(Task):
 
             keys = event.getKeys(keyList=self.const.response_keys, timeStamped=self.ttl_clock.clock)
             for key, timestamp in keys:
-                rt = timestamp - start_time
+                rt = timestamp - panda_show_time
                 responses.append((key, rt))
         else:
             # # Display trial feedback
