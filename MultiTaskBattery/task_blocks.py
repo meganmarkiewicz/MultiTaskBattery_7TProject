@@ -2208,6 +2208,31 @@ class Pong(Task):
         task_image.draw()
         self.window.flip()
 
+    def compute_landing_x(self,
+        x0, y0, dx, dy,
+        paddle_y,
+        half_screen_width,
+        ball_radius
+    ):
+        x = x0
+        y = y0
+        vx = dx
+        vy = dy
+
+        while y > paddle_y:
+            x_next = x + vx
+            y_next = y + vy
+
+            # wall bounce
+            if x_next >= half_screen_width - ball_radius or x_next <= -half_screen_width + ball_radius:
+                vx *= -1
+                x_next = x + vx
+
+            x, y = x_next, y_next
+
+        return x
+
+
     def run_trial(self, trial):
         # Set parameters (all values are in degrees)
         paddle_speed = 0.5        # Movement per frame (deg)
@@ -2257,7 +2282,22 @@ class Pong(Task):
                              fillColor="white", pos=(0, paddle_y))
         ball = visual.Circle(self.window, radius=ball_radius, fillColor="white", pos=(0, ball_y))
 
+        # compute landing needed for error log
+        landing_x = self.compute_landing_x(
+        x0=0,                  
+        y0=ball_y,
+        dx=dx,
+        dy=dy,
+        paddle_y=paddle_y,
+        half_screen_width=half_screen_width,
+        ball_radius=ball_radius
+        )
+
+        
         start_time = self.ttl_clock.get_time()
+        error_trace = []
+        sample_interval = 0.1   # 100 ms
+        last_sample_time = start_time
 
         # get movement keys
         key_left = getattr(key, self.const.response_keys[self.corr_key[0]-1].upper(), None)
@@ -2279,6 +2319,15 @@ class Pong(Task):
                 paddle.pos = (min_x, paddle.pos[1])
             if paddle.pos[0] > max_x:
                 paddle.pos = (max_x, paddle.pos[1])
+
+            # record error at every sample interval
+            now = self.ttl_clock.get_time()
+            if now - last_sample_time >= sample_interval:
+                paddle_x = paddle.pos[0]
+                abs_error = abs(paddle_x - landing_x)
+                error_trace.append(abs_error)
+
+                last_sample_time = now
 
             # Update the ball position
             if not ball_stuck:
@@ -2322,6 +2371,8 @@ class Pong(Task):
                 ball_stuck = True
                 ball_offset_x = ball.pos[0] - paddle.pos[0]
                 trial['correct'] = True
+                break
+
 
             # Draw the stimuli and update the display
             ball.draw()
@@ -2329,6 +2380,7 @@ class Pong(Task):
             self.window.flip()
 
         # Provide trial feedback
+        trial['error_trace'] = error_trace
         self.display_trial_feedback(trial['display_trial_feedback'], trial['correct'])
         return trial
 
