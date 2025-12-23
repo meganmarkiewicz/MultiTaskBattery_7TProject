@@ -919,7 +919,6 @@ class FingerSequence(Task):
     """
     def __init__(self, info, screen, ttl_clock, const, subj_id):
         super().__init__(info, screen, ttl_clock, const, subj_id)
-        self.feedback_type = 'acc'
 
     def init_task(self):
         """
@@ -942,69 +941,64 @@ class FingerSequence(Task):
         self.window.flip()
 
     def run_trial(self, trial):
-        """ Run a single trial of the finger sequence task using timed light-up cues with 4 boxes. """
 
-        # Clear any previous presses
         event.clearEvents()
 
-        # get the stim
-        sequence = trial['stim'].split()
-        num_items = len(sequence)
+        trial_stim = int(trial['stim'])
+        target_index = trial_stim - 1
 
         # define boxes
         box_positions = [(-5, 2), (-3, 2), (3, 2), (5, 2)]
-        boxes = []
-        for pos in box_positions:
-            box = visual.Rect(self.window, width=2, height=2, pos=pos, fillColor='white', lineColor='black', units='deg')
-            boxes.append(box)
+        boxes = [
+            visual.Rect(
+                self.window, width=2, height=2,
+                pos=pos, fillColor='white',
+                lineColor='black', units='deg'
+            )
+            for pos in box_positions
+        ]
 
-        # draw boxes (initially white)
+        # baseline
         for box in boxes:
             box.draw()
         self.window.flip()
 
-        correct_presses = 0
-         # wait for an initial 1 second
-        trial_start = self.ttl_clock.get_time()
-        self.ttl_clock.wait_until(trial_start + 1)  # initial delay
-        # make box light up
-        for i, digit in enumerate(sequence):
-            press_time = trial_start + 1 + i * 1.5
-            release_time = press_time + 0.5
+        if trial['trial_num'] == 1:
+            self.ttl_clock.wait_until(self.ttl_clock.get_time() + 1.0)
 
-            target_index = int(digit) - 1
+        # wait until absolute stimulus time
+        stim_onset = self.ttl_clock.get_time()
 
-            # Light up target box green
-            for j, box in enumerate(boxes):
-                box.fillColor = 'green' if j == target_index else 'white'
-                box.draw()
-            self.window.flip()
-            self.ttl_clock.wait_until(release_time)
+        # show stimulus
+        for j, box in enumerate(boxes):
+            box.fillColor = 'green' if j == target_index else 'white'
+            box.draw()
+        self.window.flip()
+        
 
-            keys = event.getKeys(keyList=self.const.response_keys, timeStamped=self.ttl_clock.clock)
-            if keys:
-                key_char, key_press_time = keys[0]
-                key = self.const.response_keys.index(key_char) + 1
+        # keep green on for trial_dur
+        self.ttl_clock.wait_until( stim_onset+ trial['trial_dur'])
 
-                # Check if key pressed is correct
-                if key == int(digit):
-                    correct_presses += 1
+        # back to white
+        for box in boxes:
+            box.fillColor = 'white'
+            box.draw()
+        self.window.flip()
 
-            
-            # if its not the last digit, wait for 0.4 with a white box
-            if i != len(sequence) - 1:
-                white_start_time = release_time
-                # Turn all boxes white again
-                for box in boxes:
-                    box.fillColor = 'white'
-                    box.draw()
-                self.window.flip()
-                self.ttl_clock.wait_until(white_start_time + 1.0) 
-        self.screen.fixation_cross('white')
+        # collect responses until absolute end_time
+        responses = []
+        while self.ttl_clock.get_time() < (stim_onset + trial['trial_dur'] + trial['iti_dur']):
+            keys = event.getKeys(
+                keyList=self.const.response_keys,
+                timeStamped=self.ttl_clock.clock
+            )
+            for key, timestamp in keys:
+                rt = timestamp - stim_onset
+                responses.append((key, rt))
 
-        # Save performance results
-        trial['correct'] = correct_presses / num_items 
+        trial['responses'] = responses
         return trial
+
     
 class Sencoding(Task):
     def __init__(self, info, screen, ttl_clock, const, subj_id):
