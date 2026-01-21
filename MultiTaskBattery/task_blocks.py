@@ -2241,10 +2241,13 @@ class Pong(Task):
         ball_radius = 0.8          # Ball radius (deg)
         trial_duration = trial['trial_dur']
 
+        # 7T bore visibility adjustment: lower ball start position
+        ball_start_offset = -3.0   
+
         # Compute the effective screen dimensions (in degrees) based on monitor calibration.
         # Get monitor width (in cm) and viewing distance (in cm) from your screen object.
-        monitor_width_cm = self.screen.monitor.getWidth()  
-        distance_cm = self.screen.distance               
+        monitor_width_cm = self.screen.monitor.getWidth()
+        distance_cm = self.screen.distance
 
         # Calculate horizontal visual angle (in degrees)
         half_width_deg = math.degrees(math.atan((monitor_width_cm / 2) / distance_cm))
@@ -2263,8 +2266,8 @@ class Pong(Task):
         max_x = half_screen_width - paddle_half_width
 
         # Define margins (in degrees)
-        paddle_margin = 2.0        
-        ball_margin = 2.0        
+        paddle_margin = 2.0
+        ball_margin = 2.0
 
         # Clear events
         event.clearEvents()
@@ -2275,7 +2278,8 @@ class Pong(Task):
 
         # Set initial positions for paddle and ball (in degrees)
         paddle_y = -half_screen_height + paddle_margin
-        ball_y = half_screen_height - ball_margin
+        # Ball starts lower to be visible in 7T bore (top of screen is cut off)
+        ball_y = half_screen_height - ball_margin + ball_start_offset
 
         # Create the paddle and ball stimuli using self.window (coordinates in deg)
         paddle = visual.Rect(self.window, width=paddle_width, height=paddle_height,
