@@ -1,3 +1,17 @@
 key_one	key_two	key_three	key_four	trial_num	hand	trial_dur	iti_dur	display_trial_feedback	stim	start_time	end_time
-1	2	3	4	0	bimanual	24.0	0	False	1 4 1 2 4 2 4 2 4 3 1 4 2 3 1 4	0.0	27.0
-
+1	2	3	4	1	bimanual	0.5	1	FALSE	1	0	1.5
+1	2	3	4	2	bimanual	0.5	1	FALSE	4	2.5	3
+1	2	3	4	3	bimanual	0.5	1	FALSE	1	4	4.5
+1	2	3	4	4	bimanual	0.5	1	FALSE	2	5.5	6
+1	2	3	4	5	bimanual	0.5	1	FALSE	4	7	7.5
+1	2	3	4	6	bimanual	0.5	1	FALSE	2	8.5	9
+1	2	3	4	7	bimanual	0.5	1	FALSE	4	10	10.5
+1	2	3	4	8	bimanual	0.5	1	FALSE	2	11.5	12
+1	2	3	4	9	bimanual	0.5	1	FALSE	4	13	13.5
+1	2	3	4	10	bimanual	0.5	1	FALSE	3	14.5	15
+1	2	3	4	11	bimanual	0.5	1	FALSE	1	16	16.5
+1	2	3	4	12	bimanual	0.5	1	FALSE	4	17.5	18
+1	2	3	4	13	bimanual	0.5	1	FALSE	2	19	19.5
+1	2	3	4	14	bimanual	0.5	1	FALSE	3	20.5	21
+1	2	3	4	15	bimanual	0.5	1	FALSE	1	22	22.5
+1	2	3	4	16	bimanual	0.5	1	FALSE	4	23.5	24
