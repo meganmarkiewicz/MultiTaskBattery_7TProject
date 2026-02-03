@@ -61,7 +61,7 @@ class TTLClock:
 
     def update(self):
         """ updates the ttl count and time of the last ttl pulse
-        """
+        """         
         # get all the ttl pulses in the buffer
         keys = event.getKeys([self.ttl_button], timeStamped=self.clock)
 

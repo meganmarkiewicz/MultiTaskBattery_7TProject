@@ -11,6 +11,7 @@ import MultiTaskBattery.utils as ut
 import MultiTaskBattery.task_blocks as tasks
 from MultiTaskBattery.ttl_clock import TTLClock
 from MultiTaskBattery.screen import Screen
+from MultiTaskBattery.serialTokeys import Convertor
 # import pylink as pl # to connect to eyelink
 
 class Experiment:
@@ -32,9 +33,10 @@ class Experiment:
         self.run_number = 0
         self.const = const
         self.ttl_clock = TTLClock()
+        self.convertor = Convertor()
         # open screen and display fixation cross
         ### set the resolution of the subject screen here:
-        self.screen = Screen(const.screen)
+        #self.screen = Screen(const.screen)
 
         # connect to the eyetracker already
         if self.const.eye_tracker:
@@ -123,6 +125,9 @@ class Experiment:
         print(f"Running the experiment - run {self.run_number}")
         self.screen.fixation_cross()
         self.ttl_clock.reset()
+        # open serial port and convert to key presses
+        self.convertor.start_serial_reader()
+
         self.ttl_clock.wait_for_first_ttl(wait = self.wait_ttl)
         run_data = []
 
@@ -170,6 +175,9 @@ class Experiment:
         if self.const.eye_tracker:
             self.stop_eyetracker()
             self.tk.receiveDataFile(self.tk_filename, self.tk_filename)
+        
+        #close serial port
+        self.convertor.stop_serial_reader()
 
         run_data = pd.DataFrame(run_data)
         # save the run data to the run file

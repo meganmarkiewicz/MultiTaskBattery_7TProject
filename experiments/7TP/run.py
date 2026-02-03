@@ -1,8 +1,10 @@
 # Main Script for an example experiment
 import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 import MultiTaskBattery.experiment_block as exp_block
 import constants as const
-
+from MultiTaskBattery.screen import Screen
 def main(subj_id):
     """ Main experiment function.
     Ensure the constants.py file is updated before running the experiment
@@ -13,10 +15,15 @@ def main(subj_id):
     """
     my_Exp = exp_block.Experiment(const, subj_id=subj_id)
 
-    while True:
-        my_Exp.confirm_run_info()
-        my_Exp.init_run()
-        my_Exp.run()
+    # while True:
+    my_Exp.confirm_run_info()
+    my_Exp.screen = Screen(const.screen)
+       # my_Exp.screen.window.winHandle.activate()
+           # my_Exp.screen.window.fullscr = True
+       # my_Exp.screen.window.flip()
+    my_Exp.init_run()
+        
+    my_Exp.run()
     return
 
 if __name__ == "__main__":

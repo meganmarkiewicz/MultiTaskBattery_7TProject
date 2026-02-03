@@ -1,0 +1,3 @@
+run_num	trial_num	hand	trial_dur	iti_dur	display_trial_feedback	stim	start_time	end_time	display_panda	real_start_time	start_ttl	start_ttl_time	response
+2	0		11	1	False	motor6.mov	0	12	False	129.00034619995859	1	129.00034839997534	[]
+2	1		11	1	False	motor1.mov	12	24	True	141.0000250999583	1	141.0000278999796	[]

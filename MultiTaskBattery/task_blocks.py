@@ -2258,7 +2258,7 @@ class Pong(Task):
         screen_height_deg = screen_width_deg * aspect_ratio
 
         half_screen_width = screen_width_deg / 2.0
-        half_screen_height = screen_height_deg / 2.0
+        half_screen_height = screen_height_deg / 1.65
 
         # Compute paddle boundaries in degrees
         paddle_half_width = paddle_width / 2.0
